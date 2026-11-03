@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "nyx-lang"
+version = "1.0.0"
+description = "NYX - a small, fast, dynamically typed programming language written in pure Python"
+readme = "README.md"
+requires-python = ">=3.8"
+license = { text = "MIT" }
+authors = [{ name = "jullewz" }]
+keywords = ["programming language", "interpreter", "compiler", "repl"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Topic :: Software Development :: Interpreters",
+    "Operating System :: OS Independent",
+]
+
+[project.scripts]
+nyx = "nyx.cli:main"
+
+[tool.setuptools]
+packages = ["nyx", "nyx.doctor"]
