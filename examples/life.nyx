@@ -1,0 +1,44 @@
+# Conway's Game of Life — animated in the terminal (Ctrl+C to stop).
+# Run it:  nyx examples/life.nyx [generations]
+
+const W = 40
+const H = 18
+let generations = args.len() > 0 ? int(args[0]) : 60
+
+seed(7)
+let grid = [[random() < 0.3 for x in 0..W] for y in 0..H]
+
+fn neighbours(g, x, y) {
+    let n = 0
+    for dy in -1..=1 {
+        for dx in -1..=1 {
+            if dx == 0 and dy == 0 { continue }
+            let yy = (y + dy + H) % H
+            let xx = (x + dx + W) % W
+            if g[yy][xx] { n += 1 }
+        }
+    }
+    return n
+}
+
+fn step(g) {
+    return [[match neighbours(g, x, y) {
+        3 => true,
+        2 => g[y][x],
+        _ => false,
+    } for x in 0..W] for y in 0..H]
+}
+
+fn render(g, gen) {
+    let rows = [row.map(fn(alive) => alive ? rgb("██", 167, 139, 250) : "  ").join("") for row in g]
+    let alive = g.map(fn(row) => row.count(true)).sum()
+    clear()
+    print(rows.join("\n"))
+    print(color("generation {gen}  ·  {alive} alive", "gray"))
+}
+
+for gen in 1..=generations {
+    render(grid, gen)
+    grid = step(grid)
+    sleep(0.05)
+}

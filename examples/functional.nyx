@@ -1,0 +1,77 @@
+# Closures, higher-order functions, pipes and comprehensions
+
+# a closure keeps its own private state
+fn counter(start = 0) {
+    let n = start
+    return fn() {
+        n += 1
+        return n
+    }
+}
+
+let next = counter(10)
+next()
+next()
+print("counter:", next())
+
+# functions that build functions
+fn compose(...fns) => fn(x) => fns.reduce(fn(acc, f) => f(acc), x)
+fn add(n) => fn(x) => x + n
+fn mul(n) => fn(x) => x * n
+
+let pipeline = compose(add(3), mul(2), add(-1))
+print("compose:", pipeline(5))
+
+# memoization with a closure over a map
+fn memoize(f) {
+    let cache = {}
+    return fn(n) {
+        if not cache.has(n) { cache[n] = f(n) }
+        return cache[n]
+    }
+}
+
+let slow_square = fn(n) => n * n
+let fast_square = memoize(slow_square)
+print("memo:", fast_square(12), fast_square(12))
+
+# a little data processing with pipes
+let people = [
+    {name: "Aino", age: 31, city: "Helsinki"},
+    {name: "Mika", age: 24, city: "Tampere"},
+    {name: "Liisa", age: 45, city: "Helsinki"},
+    {name: "Juho", age: 19, city: "Turku"},
+    {name: "Sanna", age: 28, city: "Tampere"},
+]
+
+let adults_by_age = people
+    .filter(fn(p) => p.age >= 20)
+    .sort(fn(p) => p.age)
+    .map(fn(p) => "{p.name} ({p.age})")
+print("sorted:", adults_by_age.join(", "))
+
+let by_city = people.group_by(fn(p) => p.city)
+for city, group in by_city {
+    let names = [p.name for p in group]
+    print("  {city.pad_right(9)} {names.join(", ")}")
+}
+
+let avg = people.map(fn(p) => p.age).average()
+print("average age:", fixed(avg, 1))
+
+# comprehensions + zip: pythagorean triples under 30
+let triples = []
+for a in 1..30 {
+    for b in a..30 {
+        let c = sqrt(a * a + b * b)
+        if c.is_int() and c < 30 { triples.push([a, b, int(c)]) }
+    }
+}
+print("triples:", triples.take(5), "…", triples.len(), "total")
+
+let names = ["ruby", "go", "nyx"]
+let years = [1995, 2009, 2026]
+for pair in names.zip(years) {
+    let [lang, year] = pair
+    print("  {lang.pad_right(5)} {year}")
+}

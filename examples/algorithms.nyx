@@ -1,0 +1,94 @@
+# Classic algorithms in NYX: sorting, primes, binary search, fibonacci, hanoi.
+
+fn quicksort(xs) {
+    if xs.len() <= 1 { return xs }
+    let [pivot, ...rest] = xs
+    let smaller = [x for x in rest if x < pivot]
+    let bigger = [x for x in rest if x >= pivot]
+    return quicksort(smaller) + [pivot] + quicksort(bigger)
+}
+
+fn merge_sort(xs) {
+    if xs.len() <= 1 { return xs }
+    let mid = xs.len() // 2
+    let left = merge_sort(xs.slice(0, mid))
+    let right = merge_sort(xs.slice(mid))
+    let out = []
+    let i = 0
+    let j = 0
+    while i < left.len() and j < right.len() {
+        if left[i] <= right[j] {
+            out.push(left[i])
+            i += 1
+        } else {
+            out.push(right[j])
+            j += 1
+        }
+    }
+    return out + left.slice(i) + right.slice(j)
+}
+
+fn sieve(limit) {
+    let is_prime = [true] * (limit + 1)
+    is_prime[0] = false
+    is_prime[1] = false
+    for i in 2..=floor(sqrt(limit)) {
+        if is_prime[i] {
+            let j = i * i
+            while j <= limit {
+                is_prime[j] = false
+                j += i
+            }
+        }
+    }
+    return [i for i, p in is_prime if p]
+}
+
+fn binary_search(xs, target) {
+    let lo = 0
+    let hi = xs.len() - 1
+    while lo <= hi {
+        let mid = (lo + hi) // 2
+        if xs[mid] == target { return mid }
+        if xs[mid] < target { lo = mid + 1 } else { hi = mid - 1 }
+    }
+    return -1
+}
+
+fn fib_memo() {
+    let memo = {0: 0, 1: 1}
+    fn fib(n) {
+        if not memo.has(n) { memo[n] = fib(n - 1) + fib(n - 2) }
+        return memo[n]
+    }
+    return fib
+}
+
+fn hanoi(n, from = "A", to = "C", via = "B", moves = []) {
+    if n == 0 { return moves }
+    hanoi(n - 1, from, via, to, moves)
+    moves.push("{from}→{to}")
+    hanoi(n - 1, via, to, from, moves)
+    return moves
+}
+
+seed(42)
+let data = [rand_int(1, 999) for _ in 0..20]
+print("data:      ", data)
+print("quicksort: ", quicksort(data))
+print("mergesort: ", merge_sort(data))
+print("same?      ", quicksort(data) == data.sort())
+
+let primes = sieve(100)
+print("primes:    ", primes)
+print("find 61:   ", "index", binary_search(primes, 61))
+
+let fib = fib_memo()
+print("fib(90):   ", fib(90))
+print("hanoi(3):  ", hanoi(3).join(" "))
+
+# a quick benchmark
+let t = clock()
+let big = [rand_int(0, 100000) for _ in 0..5000]
+let sorted_big = merge_sort(big)
+print(color("merge-sorted 5000 numbers in {fixed((clock() - t) * 1000, 1)} ms", "gray"))

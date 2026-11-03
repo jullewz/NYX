@@ -1,0 +1,29 @@
+# Welcome to NYX — a quick tour
+
+let name = "world"
+const version = "1.0"
+
+print("hello, {name}!")
+print("NYX {version} — {len(name)} letters in '{name}', and 6 * 7 = {6 * 7}")
+
+# lists, maps and ranges
+let langs = ["python", "rust", "nyx"]
+let person = {name: "jullewz", skills: langs, level: 99}
+
+print(person.name, "knows", person.skills.len(), "languages")
+print("squares:", [n * n for n in 1..=8])
+print("evens:  ", (1..20).filter(fn(n) => n % 2 == 0))
+
+# functions with default arguments
+fn greet(who, greeting = "hey") {
+    return "{greeting}, {who}!".capitalize()
+}
+print(greet("jullewz"))
+print(greet("everyone", "good evening"))
+
+# the pipe operator passes a value into the next function
+fn double(x) => x * 2
+fn shout(s) => s.upper() + "!"
+
+print(21 |> double)
+print("pipes are neat" |> shout)

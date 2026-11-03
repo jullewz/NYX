@@ -1,0 +1,33 @@
+# Errors: try / catch / finally / throw — and what an uncaught error looks like.
+
+fn parse_age(text) {
+    let n = num(text)
+    if n < 0 or n > 150 {
+        throw {message: "age out of range", value: n}
+    }
+    return n
+}
+
+for input in ["42", "abc", "-3"] {
+    try {
+        print("parsed", parse_age(input))
+    } catch err {
+        print("could not parse '{input}':", err.message)
+    } finally {
+        print("  (checked '{input}')")
+    }
+}
+
+# runtime errors become catchable error objects
+try {
+    let xs = [1, 2, 3]
+    print(xs[10])
+} catch e {
+    print("caught a {e.type} on line {e.line}: {e.message}")
+}
+
+# NYX helps when you make a typo — uncomment the last line to see it:
+let counter = 3
+fn total(items) => items.reduce(fn(a, b) => a + b, counter)
+print("total:", total([1, 2, 3]))
+# print(countr)

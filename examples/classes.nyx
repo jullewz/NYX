@@ -1,0 +1,74 @@
+# Classes, inheritance, super, static methods and to_str
+
+class Vector {
+    fn init(x, y) {
+        self.x = x
+        self.y = y
+    }
+
+    fn add(other) => Vector(self.x + other.x, self.y + other.y)
+    fn scale(k) => Vector(self.x * k, self.y * k)
+    fn length() => sqrt(self.x ** 2 + self.y ** 2)
+    fn to_str() => "Vector({self.x}, {self.y})"
+
+    static fn zero() => Vector(0, 0)
+}
+
+let a = Vector(3, 4)
+let b = Vector(1, 2)
+print(a, "+", b, "=", a.add(b))
+print("|a| =", a.length())
+print("zero:", Vector.zero())
+
+class Account {
+    fn init(owner, balance = 0) {
+        self.owner = owner
+        self.balance = balance
+        self.history = []
+    }
+
+    fn deposit(amount) {
+        if amount <= 0 { throw "deposit must be positive" }
+        self.balance += amount
+        self.history.push("+{amount}")
+        return self
+    }
+
+    fn withdraw(amount) {
+        if amount > self.balance {
+            throw {message: "insufficient funds", wanted: amount, have: self.balance}
+        }
+        self.balance -= amount
+        self.history.push("-{amount}")
+        return self
+    }
+
+    fn to_str() => "{self.owner}: {self.balance} credits"
+}
+
+class SavingsAccount extends Account {
+    fn init(owner, balance, rate) {
+        super.init(owner, balance)
+        self.rate = rate
+    }
+
+    fn add_interest() {
+        let interest = round(self.balance * self.rate, 2)
+        return self.deposit(interest)
+    }
+
+    fn to_str() => super.to_str() + " (savings @ {self.rate * 100}%)"
+}
+
+let acct = SavingsAccount("jullewz", 1000, 0.05)
+acct.deposit(250).withdraw(100).add_interest()
+print(acct)
+print("history:", acct.history.join(" "))
+
+try {
+    acct.withdraw(1_000_000)
+} catch err {
+    print("✖ {err.message}: wanted {err.wanted}, have {err.have}")
+}
+
+print("is an Account?", is_instance(acct, Account))

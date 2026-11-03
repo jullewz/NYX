@@ -1,0 +1,51 @@
+# Pattern matching: literals, alternatives, ranges, bindings and guards.
+
+fn describe(n) => match n {
+    0 => "zero",
+    1 | 2 | 3 => "a few",
+    4..10 => "several",
+    x if x < 0 => "negative ({x})",
+    x if x % 2 == 0 => "a big even number",
+    _ => "a big odd number",
+}
+
+for n in [0, 2, 7, -5, 42, 99] {
+    print("{str(n).pad_left(3)} is {describe(n)}")
+}
+
+# FizzBuzz, the match way
+let line = []
+for i in 1..=20 {
+    line.push(match [i % 3, i % 5] {
+        v if v == [0, 0] => "FizzBuzz",
+        v if v[0] == 0 => "Fizz",
+        v if v[1] == 0 => "Buzz",
+        _ => i,
+    })
+}
+print(line.join(" "))
+
+# a tiny command interpreter
+fn run(cmd, stack) {
+    let [op, ...rest] = cmd.split()
+    match op {
+        "push" => { stack.push(num(rest[0])) }
+        "add" => { stack.push(stack.pop() + stack.pop()) }
+        "mul" => { stack.push(stack.pop() * stack.pop()) }
+        "dup" => { stack.push(stack.last()) }
+        _ => { throw "unknown command '{op}'" }
+    }
+    return stack
+}
+
+let stack = []
+for cmd in ["push 6", "push 7", "mul", "dup", "add"] {
+    run(cmd, stack)
+}
+print("stack machine result:", stack)
+
+try {
+    run("explode", stack)
+} catch e {
+    print("error:", e)
+}

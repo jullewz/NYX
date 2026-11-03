@@ -1,0 +1,10 @@
+# Modules: import another .nyx file and use what it defines.
+
+import "lib/geometry.nyx" as geo
+
+let shapes = [geo.Circle(2), geo.Rect(3, 4), geo.Circle(0.5)]
+for s in shapes.sort(fn(s) => s.area()) {
+    print("{s.name().pad_right(7)} area {fixed(s.area(), 2).pad_left(6)}")
+}
+print("total area:", fixed(geo.total_area(shapes), 3))
+print("module says:", geo.VERSION)

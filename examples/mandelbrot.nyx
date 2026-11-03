@@ -1,0 +1,58 @@
+# The Mandelbrot set, rendered in your terminal in 24-bit color.
+# Each character cell shows two pixels using the "▀" half block,
+# so the picture has double the vertical resolution.
+# Run it:  nyx examples/mandelbrot.nyx
+
+const WIDTH = 76
+const ROWS = 30              # text rows -> 60 pixel rows
+const MAX_ITER = 80
+const SHADES = " .:-=+*#%@"
+
+fn escape(cx, cy) {
+    let x = 0.0
+    let y = 0.0
+    let i = 0
+    while i < MAX_ITER and x * x + y * y <= 4 {
+        let xt = x * x - y * y + cx
+        y = 2 * x * y + cy
+        x = xt
+        i += 1
+    }
+    return i
+}
+
+fn mix(a, b, t) => [a[k] + (b[k] - a[k]) * t for k in 0..3]
+
+# night sky -> violet -> cyan -> white
+fn palette(n) {
+    if n >= MAX_ITER { return [0, 0, 0] }
+    let t = sqrt(n / MAX_ITER)
+    if t < 0.35 { return mix([8, 6, 28], [109, 40, 217], t / 0.35) }
+    if t < 0.7 { return mix([109, 40, 217], [56, 189, 248], (t - 0.35) / 0.35) }
+    return mix([56, 189, 248], [245, 243, 255], (t - 0.7) / 0.3)
+}
+
+fn point(px, py) {
+    let cx = px / WIDTH * 3.1 - 2.2
+    let cy = py / (ROWS * 2) * 2.4 - 1.2
+    return escape(cx, cy)
+}
+
+let start = clock()
+for row in 0..ROWS {
+    let line = ""
+    for col in 0..WIDTH {
+        let top = point(col, row * 2)
+        let bottom = point(col, row * 2 + 1)
+        if has_color() {
+            let [r1, g1, b1] = palette(top)
+            let [r2, g2, b2] = palette(bottom)
+            line += bg_rgb(rgb("▀", r1, g1, b1), r2, g2, b2)
+        } else {
+            let n = (top + bottom) // 2
+            line += n >= MAX_ITER ? " " : SHADES[floor(n / MAX_ITER * (len(SHADES) - 1))]
+        }
+    }
+    print(line)
+}
+print(color("{WIDTH}x{ROWS * 2} pixels · {MAX_ITER} iterations · {fixed(clock() - start, 2)}s", "gray"))

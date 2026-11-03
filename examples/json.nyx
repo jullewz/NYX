@@ -1,0 +1,19 @@
+# JSON in and out, plus files.
+
+let config = {
+    app: "nyx-demo",
+    version: [1, 0, 0],
+    features: {pipes: true, classes: true, match: true},
+    authors: ["jullewz"],
+}
+
+let text = json_str(config, 2)
+write_file("demo-config.json", text)
+print("wrote demo-config.json ({len(text)} bytes)")
+
+let loaded = json_parse(read_file("demo-config.json"))
+print("app:", loaded.app, "· version:", loaded.version.join("."))
+
+let enabled = [name for name, on in loaded.features if on]
+print("features:", enabled.join(", "))
+print("same data after round trip?", loaded == config)
