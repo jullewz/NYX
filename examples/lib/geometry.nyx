@@ -1,0 +1,27 @@
+# A small module. Everything not starting with _ is exported.
+
+const VERSION = "geometry 1.0"
+
+class Shape {
+    fn area() => 0
+    fn name() => "shape"
+}
+
+class Circle extends Shape {
+    fn init(r) { self.r = r }
+    fn area() => PI * self.r ** 2
+    fn name() => "circle"
+}
+
+class Rect extends Shape {
+    fn init(w, h) {
+        self.w = w
+        self.h = h
+    }
+    fn area() => self.w * self.h
+    fn name() => "rect"
+}
+
+fn _sum(xs) => xs.reduce(fn(a, b) => a + b, 0)
+
+fn total_area(shapes) => _sum(shapes.map(fn(s) => s.area()))
